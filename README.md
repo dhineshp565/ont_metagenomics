@@ -1,7 +1,7 @@
 # ONT Metagenomics Pipeline
 
 ## Overview
-Automated Nextflow pipeline for analyzing Oxford Nanopore Technologies (ONT) metagenomic sequencing data. The workflow performs quality control, host decontamination, taxonomic classification, per-taxa assembly/consensus generation, and creporting.
+Automated Nextflow pipeline for analyzing Oxford Nanopore Technologies (ONT) metagenomic sequencing data. The workflow performs quality control, host decontamination, taxonomic classification, per-taxa assembly/consensus generation, and reporting.
 
 ## Workflow Steps
 
@@ -10,7 +10,7 @@ Automated Nextflow pipeline for analyzing Oxford Nanopore Technologies (ONT) met
 3. **Abundance Estimation**: Estimates species abundance using Bracken.
 4. **Visualization**: Generates interactive Krona plots.
 5. **Binning & Extraction**: Splits reads into separate files based on their TaxID using Bracken results.
-6. ** Generation**: Assemblies are generated per TaxID using megathit.
+6. **Generation**: Assemblies are generated per TaxID using megathit.
 1. **Validation**: Consensus sequences are BLASTed against a reference database.
 2. **Reporting**: Generates an interactive HTML report containing:
    - Summary statistics.
@@ -66,15 +66,16 @@ nextflow run dhineshp565/ont_metagenomics \
 
 The pipeline leverages the following open-source bioinformatics tools:
 
-| Tool | Purpose | Source |
-|------|---------|--------|
-| **Nextflow** | Workflow management and orchestration | [Link](https://www.nextflow.io/) |
-| **Kraken2** | Taxonomic classification of reads | [Link](https://ccb.jhu.edu/software/kraken2/) |
-| **Bracken** | Bayesian abundance estimation | [Link](https://ccb.jhu.edu/software/bracken/) |
-| **KrakenTools** | Extracting reads by TaxID | [Link](https://github.com/jenniferlu717/KrakenTools) |
-| **MEGAHIT** | Ultra-fast metagenomic assembler | [Link](https://github.com/voutcn/megahit) |
-| **Krona** | Hierarchical data visualization | [Link](https://github.com/marbl/Krona) |
-| **BLAST+** | Consensus verification against reference | [Link](https://blast.ncbi.nlm.nih.gov/Blast.cgi) |
-| **R** | Report generation (rmarkdown, knitr, kableExtra) | [Link](https://www.r-project.org/) |
+| Tool | Purpose |
+|------|---------|
+| **[Nextflow](https://www.nextflow.io/)** | Workflow management and orchestration |
+| **[Docker](https://www.docker.com/)** | Containerization and reproducibility |
+| **[Kraken2](https://ccb.jhu.edu/software/kraken2/)** | Taxonomic classification of reads |
+| **[Bracken](https://ccb.jhu.edu/software/bracken/)** | Bayesian abundance estimation |
+| **[KrakenTools](https://github.com/jenniferlu717/KrakenTools)** | Extracting reads by TaxID |
+| **[MEGAHIT](https://github.com/voutcn/megahit)** | Ultra-fast metagenomic assembler |
+| **[Krona](https://github.com/marbl/Krona)** | Hierarchical data visualization |
+| **[BLAST+](https://blast.ncbi.nlm.nih.gov/Blast.cgi)** | Consensus verification against reference |
+| **[R](https://www.r-project.org/)** | Report generation (rmarkdown, knitr, kableExtra) |
 
 
