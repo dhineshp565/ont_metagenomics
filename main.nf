@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 
 // Include local modules
 include { make_csv } from './modules/local/make_csv.nf'
-include { merge_fastq } from './modules/local/merge_fastq.nf'
+include { merge_filter_fastq } from './modules/local/merge_filter_fastq.nf'
 include { nanoplot } from './modules/local/nanoplot.nf'
 include { porechop } from './modules/local/porechop.nf'
 include { minimap2 } from './modules/local/minimap2.nf'
@@ -15,6 +15,7 @@ include { bracken } from './modules/local/bracken.nf'
 // Include dehost subworkflow
 include { DEHOST } from './subworkflows/dehost.nf'
 include { METAGENOMICS } from './subworkflows/metagenomics.nf'
+include { QCREADS } from './subworkflows/qcreads.nf'
 
 
 workflow {

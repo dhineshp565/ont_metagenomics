@@ -1,5 +1,5 @@
 ---
-title: "Bov Results Report"
+title: "Metagenomics Results Report"
 author: "Generated using [ont_metagenomics](https://github.com/dhineshp565/ont_metagenomics) pipeline"
 date: "`r Sys.Date()`"
 output: 
@@ -50,16 +50,60 @@ for (i in sampleid){
 
   cat('\n\n<!-- -->\n\n')
 
-  # display blast results
+  # --------------------------------------------------------------------------
+  # Process BLAST Results
+  # --------------------------------------------------------------------------
+  
+  # Construct filename for the best BLAST hits report
   blast_ids <- (paste(i,"_report_blast_best.tsv",sep=""))
+  
+  # Read the tab-separated BLAST report
   blast_raw <- read.csv(blast_ids,header = TRUE,sep = "\t")
+  
+  # Select relevant columns: Query ID, Length, Coverage, Identity, E-value, Subject TaxIDs, Title
   blast_final <- blast_raw[,c(1,3,4,5,6,7,10)]
   colnames(blast_final) <- c("QUERY_ID","LENGTH","%COVERAGE","%IDENTITY","E_VAL","TAXIDS","STITLE")
 
-  # Sort by taxids
+  # Convert numerical columns to numeric type
+  # use suppressWarnings to silence "NAs introduced by coercion" when 'none' values are converted to NA
+  suppressWarnings({
+    blast_final$`E_VAL` <- as.numeric(as.character(blast_final$`E_VAL`))
+    blast_final$`%IDENTITY` <- as.numeric(as.character(blast_final$`%IDENTITY`))
+    blast_final$`%COVERAGE` <- as.numeric(as.character(blast_final$`%COVERAGE`))
+  })
+
+  # Filter BLAST results based on quality thresholds:
+  # 1. remove rows where E_VAL is NA (failed conversion from 'none')
+  # 2. Strict E-value cutoff (< 1e-25)
+  # 3. High Identity (> 90%)
+  # 4. Moderate Coverage (> 50%)
+  # Then sort by Importance: E-value (asc) -> Identity (desc) -> Coverage (desc)
   blast_final <- blast_final %>%
-  arrange(`QUERY_ID`)
-  print(knitr::kable(blast_final,align = "lccccl",caption = "Consensus compared to custom NCBI BLAST database containing REFSEQ (Prokaryotes,Virus,Fungi,Protozoa). Generated using [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi)")) 
+  filter(!is.na(E_VAL) & E_VAL < 1e-25 & `%IDENTITY` > 90 & `%COVERAGE` > 50) %>%
+  arrange(`E_VAL`, desc(`%IDENTITY`), desc(`%COVERAGE`))
+  
+  # --------------------------------------------------------------------------
+  # Generate Organism-Specific Tables
+  # --------------------------------------------------------------------------
+  
+  # Iterate through each TaxID identified by Bracken to create specific BLAST tables
+  for(row in 1:nrow(bracken_final)) {
+      tid <- bracken_final[row, "Taxid"]
+      org_name <- bracken_final[row, "Organsim"]
+      
+      # Filter BLAST hits for the current organism
+      # Matches query IDs containing the specific TaxID (format: ..._taxid_...)
+      blast_subset <- blast_final[grep(paste0("_", tid, "_"), blast_final$QUERY_ID), ]
+      
+      # Only display a table if there are valid hits passing filters
+      if (nrow(blast_subset) > 0) {
+          cat(paste0("<h5 style='color: darkblue; font-weight: bold;'>", org_name, " (TaxID: ", tid, ")</h5>\n"))
+          print(knitr::kable(blast_subset, align = "lccccl", row.names = FALSE, 
+              caption = paste0("Consensus BLAST hits for ", org_name, ". Generated using [BLAST](https://blast.ncbi.nlm.nih.gov/Blast.cgi)")) %>%
+            kable_styling(full_width = F))
+          cat('\n\n<!-- -->\n\n')
+      }
+  } 
   
   cat('\n\n<!-- -->\n\n')
 } 

@@ -36,15 +36,25 @@ awk '
 # If the report still has only the header (no hits and no per-query "none" rows),
 # add a single global "none" row
 if [[ "$(wc -l < "$report_file")" -le 1 ]]; then
+    # Header + empty row
     echo -e "none\tnone\tnone\tnone\tnone\tnone\tnone\tnone\tnone\tnone" >> "$report_file"
 fi
 
-# Keep only the best hit per query (highest coverage, then highest identity)
+# Keep only the best hit per query (highest identity, then highest coverage)
 # 1) write header
 head -n 1 "$report_file" > "$best_hits_file"
-# 2) sort by query, coverage (col 4 desc), identity (col 5 desc)
-# 3) keep first row per query
-#    (we assume input is already sorted by those keys)
+# 2) sort by query, E-value (col 6 asc), identity (col 5 desc), coverage (col 4 desc)
+# 3) keep all best hits per query (in case of ties)
 tail -n +2 "$report_file" \
-    | sort -t$'\t' -k1,1 -k4,4rn -k5,5rn \
-    | awk -F'\t' 'BEGIN{OFS=FS} { if ($1 != prev) { print; prev = $1 } }' >> "$best_hits_file"
+    | sort -t$'\t' -k1,1 -k6,6g -k5,5rn -k4,4rn \
+    | awk -F'\t' 'BEGIN{OFS=FS} { 
+        if ($1 != prev) { 
+            print; 
+            prev = $1; 
+            best_e = $6; 
+            best_id = $5; 
+            best_cov = $4 
+        } else if ($6 == best_e && $5 == best_id && $4 == best_cov) {
+            print
+        }
+    }' >> "$best_hits_file"
