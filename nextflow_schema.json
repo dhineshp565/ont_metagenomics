@@ -33,6 +33,13 @@
                     "description": "Path to kraken2 database",
                     "default": "/data/referenceDB/kraken/k2_pluspf_08gb_20230605"
                 },
+                "kraken_confidence": {
+                    "type": "number",
+                    "default": 0.01,
+                    "description": "Confidence threshold for kraken2 classification (between 0 and 1)",
+                    "minimum": 0.00,
+                    "maximum": 1.00
+                },
                  "blastdb_path": {
                     "type": "string",
                     "default": "/data/referenceDB/blast/microbe_db",
