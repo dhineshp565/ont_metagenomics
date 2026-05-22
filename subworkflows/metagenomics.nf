@@ -165,7 +165,7 @@ process blast_cons {
 
 	# If only header was written (no BLAST hits), add a "NaN" placeholder row
 	if [[ \$(wc -l < "${SampleName}_blast.tsv") -le 1 ]]; then
-	    echo -e "NaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN" >> "${SampleName}_blast.tsv"
+	    echo -e "${SampleName}_0\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNaN\tNo hits" >> "${SampleName}_blast.tsv"
 	fi
 	"""
 
